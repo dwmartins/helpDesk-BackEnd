@@ -1,23 +1,23 @@
-const Sequelize = require('sequelize');
+const { Sequelize, DataTypes} = require('sequelize');
 const dataBase = require('../../../config/db');
 
 const User = dataBase.define('User', {
-    id: {
-        type: Sequelize.INTEGER,
+    user_id: {
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true
     },
     user_nome: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false,
     },
     user_sobrenome: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false,
     },
     user_email: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true,
         validate: {
@@ -25,23 +25,27 @@ const User = dataBase.define('User', {
         },
     },
     user_password: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false,
     },
+    user_tipo: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     user_ativo: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: true
     },
-    user_data_create: {
-        type: Sequelize.DATE,
+    user_date_create: {
+        type: DataTypes.DATE,
         allowNull: true
     },
-    user_data_desable: {
-        type: Sequelize.DATE,
+    user_date_desable: {
+        type: DataTypes.DATE,
         allowNull: true
     },
     user_foto: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: true,
     }
 });
