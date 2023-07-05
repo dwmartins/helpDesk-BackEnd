@@ -19,9 +19,9 @@ class User {
                 user_foto: user_foto
             });
     
-            return {success: true, message: `O usuário(a) ${user_nome} foi criado com sucesso.`};
+            return {success: true, msg: `O usuário(a) ${user_nome} foi criado com sucesso.`};
         } catch (error) {
-            return {error: true, message: `Erro ao criar o usuário.`};
+            return {erro: error, msg: `Erro ao criar o usuário.`};
         }
     }
 
@@ -29,13 +29,13 @@ class User {
         try {
             this.results = await UserSchema.findAll({
                 order: [
-                    ['user_date_creat', 'ASC']
+                    ['user_date_create', 'ASC']
                 ]
             });
 
             return this.results;
         } catch(error) {
-            return {error: true, message: `Erro ao buscar os usuários.`};
+            return {erro: error, msg: `Erro ao buscar os usuários.`};
         }
     }
 
@@ -51,7 +51,7 @@ class User {
             return this.userExists;
 
         } catch (error) {
-            return {error: true, message: `Erro ao verificar e-mail existente.`}
+            return {erro: error, msg: `Erro ao verificar e-mail existente.`}
         }
     }
 }

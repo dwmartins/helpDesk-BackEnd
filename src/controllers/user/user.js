@@ -10,14 +10,16 @@ async function newUser(req, res) {
 
     if(!emailExists.length) {
         const user =  await userDB.createNewUser(user_nome, user_sobrenome, user_email, user_password, user_tipo, user_ativo, user_foto);
-        if(!user.error) {
+        if(user.success) {
             res.status(201).json(user);
         } else {
-            res.status(500).json(user)
+            res.status(500).json(user);
         }
-    } else {
+    } else if(emailExists.length){
         return res.status(409).json({alert: `Este e-mail já está em uso.`});
-    };
+    } else {
+        return res.status(500).json({erro: emailExists.erro, msg: `Erro interno ao criar um novo usuário.`})
+    }
 };
 
 async function allUsers(req, res) {
