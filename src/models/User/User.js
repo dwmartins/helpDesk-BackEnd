@@ -1,10 +1,13 @@
 const dataBase = require('../../../config/db');
 const UserSchema = require('../schemas/user');
+const bcrypt = require('bcrypt');
 
 class User {
 
     results = [];
     userExists = [];
+    passwordHash = '';
+    
 
     async createNewUser(user_nome, user_sobrenome, user_email, user_password, user_tipo, user_ativo, user_foto) {
         try {
@@ -52,6 +55,15 @@ class User {
 
         } catch (error) {
             return {erro: error, msg: `Erro ao verificar e-mail existente.`}
+        }
+    }
+
+    async encodePassword(password) {
+        try {
+            const hash = await bcrypt.hash(password, 10);
+            return hash
+        } catch (error) {
+            throw new Error(`Erro ao codificar a senha: ${error}`);
         }
     }
 }

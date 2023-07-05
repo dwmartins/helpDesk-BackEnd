@@ -9,7 +9,9 @@ async function newUser(req, res) {
     const emailExists = await userDB.existingEmail(user_email);
 
     if(!emailExists.length) {
-        const user =  await userDB.createNewUser(user_nome, user_sobrenome, user_email, user_password, user_tipo, user_ativo, user_foto);
+        
+        const password = await userDB.encodePassword(user_password);
+        const user =  await userDB.createNewUser(user_nome, user_sobrenome, user_email, password, user_tipo, user_ativo, user_foto);
         if(user.success) {
             res.status(201).json(user);
         } else {
