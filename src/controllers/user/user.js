@@ -56,8 +56,19 @@ async function disableUser(req, res) {
     }
 }
 
+async function deleteUser(req, res) {
+    const { user_id } = req.params;
+    const user = await userDB.deleteUserDB(user_id);
+    if(!user.erro) {
+        const msg = {msg: `Usuário excluído com sucesso.`};
+        sendResponse(res, 200, msg);
+    } else {
+        sendResponse(res, 500, user);
+    }
+}
+
 function sendResponse(res, statusCode, msg) {
     res.status(statusCode).json(msg);
 }
 
-module.exports = {newUser, allUsers, updateUser, disableUser};
+module.exports = {newUser, allUsers, updateUser, disableUser, deleteUser};

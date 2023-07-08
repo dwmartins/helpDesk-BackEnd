@@ -55,7 +55,22 @@ class User {
 
             return true;
         } catch (error) {
-            return {erro: error, msg: `Erro ao desabilitar o usuário.`}
+            return {erro: error, msg: `Erro ao desabilitar o usuário.`};
+        }
+    }
+
+    async deleteUserDB(user_id) {
+        try {
+            await UserSchema.destroy({
+                where: {
+                    user_id: user_id
+                },
+                force: true
+            });
+
+            return true
+        } catch (error) {
+            return {erro: error, msg: `Erro ao excluir o usuário`};
         }
     }
 
