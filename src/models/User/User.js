@@ -45,6 +45,20 @@ class User {
         }
     }
 
+    async disableUserDB(user_id) {
+        try {
+            await UserSchema.update({
+                user_ativo: 'N'
+            },
+            {where: {user_id: user_id}}
+            );
+
+            return true;
+        } catch (error) {
+            return {erro: error, msg: `Erro ao desabilitar o usuário.`}
+        }
+    }
+
     async allUsersDB() {
         try {
             this.results = await UserSchema.findAll({

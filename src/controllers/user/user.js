@@ -44,8 +44,20 @@ async function updateUser(req, res) {
     }
 }
 
+async function disableUser(req, res) {
+    const {user_id} = req.params;
+    const user = await userDB.disableUserDB(user_id);
+
+    if(!user.erro) {
+        const msg = {msg: `Usuário desabilitado com sucesso.`};
+        sendResponse(res, 200, msg);
+    } else {
+        sendResponse(res, 500, user);
+    }
+}
+
 function sendResponse(res, statusCode, msg) {
     res.status(statusCode).json(msg);
 }
 
-module.exports = {newUser, allUsers, updateUser};
+module.exports = {newUser, allUsers, updateUser, disableUser};
