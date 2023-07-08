@@ -22,7 +22,7 @@ class User {
                 user_foto: user_foto
             });
     
-            return {success: true, msg: `O usuário(a) ${user_nome} foi criado com sucesso.`};
+            return {success: true, msg: `O usuário(a) criado com sucesso.`};
         } catch (error) {
             return {erro: error, msg: `Erro ao criar o usuário.`};
         }

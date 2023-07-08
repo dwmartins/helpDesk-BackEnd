@@ -13,24 +13,30 @@ async function newUser(req, res) {
         const password = await userDB.encodePassword(user_password);
         const user =  await userDB.createNewUser(user_nome, user_sobrenome, user_email, password, user_tipo, user_ativo, user_foto);
         if(user.success) {
-            res.status(201).json(user);
+            sendResponse(res, 201, user);
         } else {
-            res.status(500).json(user);
+            sendResponse(res, 500, user)
         }
     } else if(emailExists.length){
-        return res.status(409).json({alert: `Este e-mail já está em uso.`});
+        const msg = {alert: `Este e-mail já está em uso.`};
+        sendResponse(res, 409, msg);
     } else {
-        return res.status(500).json({erro: emailExists.erro, msg: `Erro interno ao criar um novo usuário.`})
+        const msg = {erro: emailExists.erro, msg: `Erro ao criar o usuário.`};
+        sendResponse(res, 500, msg);
     }
 };
 
 async function allUsers(req, res) {
     const users = await userDB.allUsersDB();
     if(!users.error) {
-        res.status(200).json(users);
+        sendResponse(res, 200, users);
     } else {
-        res.status(500).json(users);
+        sendResponse(res, 500, users)
     };
 };
+
+function sendResponse(res, statusCode, msg) {
+    res.status(statusCode).json(msg);
+}
 
 module.exports = {newUser, allUsers}
