@@ -67,8 +67,19 @@ async function deleteUser(req, res) {
     }
 }
 
+async function userLogin(req, res) {
+    const { user_email, user_password } = req.body;
+    const user = await userDB.userLoginDB(user_email, user_password);
+}
+
 function sendResponse(res, statusCode, msg) {
     res.status(statusCode).json(msg);
 }
 
-module.exports = {newUser, allUsers, updateUser, disableUser, deleteUser};
+module.exports = {  newUser, 
+                    allUsers,
+                    updateUser,
+                    disableUser,
+                    deleteUser,
+                    userLogin
+                };

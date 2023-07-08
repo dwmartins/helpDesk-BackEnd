@@ -112,6 +112,47 @@ class User {
             throw new Error(`Erro ao codificar a senha: ${error}`);
         }
     }
+
+    async searchPasswordUserDB(user_email) {
+        try {
+            const result = await UserSchema.findAll({
+                attributes: ['user_password'],
+                where: {user_email: user_email}
+            });
+
+            return result;
+        } catch (error) {
+            return {erro: error, msg: `Erro ao buscar o usuário`};
+        }
+    }
+
+    async decodePassword(req_password, hash) {
+        try {
+            const result = await bcrypt.compare(req_password, hash);
+            return result;
+        } catch (error) {
+            return {erro: error, msg: `Erro ao decodificar senha.`};
+        }
+    }
+
+    async userLoginDB(user_email, user_password) {
+        const searchPasswordUser = this.searchPasswordUserDB(user_email);
+        const passwordHash = this.decodePassword(user_password, searchPasswordUser);
+
+        if(passwordHash) {
+            try {
+                const user = await UserSchema.findAll({
+                    attributes: [user_email],
+                    where: {
+                        user_ativo: 'S'
+                    }
+                });
+                return user;
+            } catch (error) {
+                return {erro: error, msg: `Erro ao realizar o login.`}
+            }
+        }
+    }
 }
 
 module.exports = User;
