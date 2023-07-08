@@ -4,5 +4,6 @@ const user = express.Router();
 
 user.post('/novo-usuario', controllers.newUser);
 user.get('/todos-usuarios', controllers.allUsers);
+user.put('/atualiza-usuario', controllers.updateUser);
 
 module.exports = user;

@@ -1,3 +1,4 @@
+const { where } = require('sequelize');
 const dataBase = require('../../../config/db');
 const UserSchema = require('../schemas/user');
 const bcrypt = require('bcrypt');
@@ -25,6 +26,22 @@ class User {
             return {success: true, msg: `O usuário(a) criado com sucesso.`};
         } catch (error) {
             return {erro: error, msg: `Erro ao criar o usuário.`};
+        }
+    }
+
+    async updateUserDB(user_id, user_nome, user_sobrenome, user_foto) {
+        try {
+            await UserSchema.update({
+                user_nome: user_nome,
+                user_sobrenome: user_sobrenome,
+                user_foto: user_foto
+            },
+            {where: {user_id: user_id}}
+            );
+
+            return true;
+        } catch (error) {
+            return {erro: error, msg: `Erro ao atualizar o usuário.`};
         }
     }
 

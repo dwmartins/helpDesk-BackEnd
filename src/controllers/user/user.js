@@ -8,7 +8,6 @@ async function newUser(req, res) {
     const emailExists = await userDB.existingEmail(user_email);
 
     if(!emailExists.length) {
-        
         const password = await userDB.encodePassword(user_password);
         const user =  await userDB.createNewUser(user_nome, user_sobrenome, user_email, password, user_tipo, user_ativo, user_foto);
         if(user.success) {
@@ -27,15 +26,26 @@ async function newUser(req, res) {
 
 async function allUsers(req, res) {
     const users = await userDB.allUsersDB();
-    if(!users.error) {
+    if(!users.erro) {
         sendResponse(res, 200, users);
     } else {
         sendResponse(res, 500, users)
     };
 };
 
+async function updateUser(req, res) {
+    const {user_id, user_nome, user_sobrenome, user_foto} = req.body;
+    const user = await userDB.updateUserDB(user_id, user_nome, user_sobrenome, user_foto);
+    if(!user.erro) {
+        const msg = {msg: `Usuário atualizado com sucesso.`};
+        sendResponse(res, 201, msg);
+    } else {
+        sendResponse(res, 500, user);
+    }
+}
+
 function sendResponse(res, statusCode, msg) {
     res.status(statusCode).json(msg);
 }
 
-module.exports = {newUser, allUsers}
+module.exports = {newUser, allUsers, updateUser};
