@@ -1,6 +1,5 @@
 const User = require('../../models/User/User');
 const dataBase = require('../../../config/db');
-dataBase.sync();
 
 const userDB = new User;
 
