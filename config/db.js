@@ -22,7 +22,7 @@ async function checkConnection() {
 }
 
 checkConnection();
-sequelize.sync();
+sequelize.sync({ alter: true });
 
 module.exports = sequelize;
 

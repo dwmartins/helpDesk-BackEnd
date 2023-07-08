@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const port = 3000;
+const user = require('./src/routes/user');
 require('./config/db');
 require('dotenv').config();
 
@@ -11,6 +12,8 @@ app.use(express.json());
 app.get('/', (req, res) => {
     res.status(200).send(`<h2>running server!</h2>`)
 });
+
+app.use('/', user);
 
 app.use((req, res, next) => {
     const erro = new Error('route not found');
