@@ -80,6 +80,7 @@ class User {
     async allUsersDB() {
         try {
             this.results = await UserSchema.findAll({
+                where: {user_ativo: 'S'},
                 order: [
                     ['user_date_create', 'ASC']
                 ]
