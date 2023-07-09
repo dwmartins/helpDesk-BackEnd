@@ -70,6 +70,13 @@ async function deleteUser(req, res) {
 async function userLogin(req, res) {
     const { user_email, user_password } = req.body;
     const user = await userDB.userLoginDB(user_email, user_password);
+    if(user.success) {
+        sendResponse(res, 200, user.userData);
+    } else if(user.alert) {
+        sendResponse(res, 400, user.alert);
+    } else if(user.erro){
+        sendResponse(res, 500, user);
+    }
 }
 
 function sendResponse(res, statusCode, msg) {
