@@ -1,7 +1,7 @@
 const { Sequelize, DataTypes} = require('sequelize');
 const dataBase = require('../../../config/db');
 
-const User = dataBase.define('User', {
+const User = dataBase.define('users', {
     user_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -31,6 +31,10 @@ const User = dataBase.define('User', {
     user_tipo: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    user_token: {
+        type: DataTypes.STRING,
+        allowNull: false
     },
     user_ativo: {
         type: DataTypes.STRING,
