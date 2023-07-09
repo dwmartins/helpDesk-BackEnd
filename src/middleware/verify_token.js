@@ -10,8 +10,6 @@ async function authenticateToken(req, res, next) {
         const msg = { mensagem: 'Token não fornecido' };
         return sendResponse(res, 401, msg)
     }
-    console.log(user_id);
-    console.log(user_token);
 
     try {
         const fetchUserToken = await userDB.fetchUserToken(user_id);

@@ -79,10 +79,12 @@ async function userLogin(req, res) {
         const payload  = { email: user.userData.user_email };
         const token = jwt.sign(payload, user.userData.user_token);
         const data = {user_token: token, user: user.userData};
-        
+        const user_ip = req.ip.replace('::ffff:', '');
+
+        await userDB.userAccess(user.userData.user_id, user_email, user_ip);
         sendResponse(res, 200, data);
     } else if(user.alert) {
-        sendResponse(res, 400, user.alert);
+        sendResponse(res, 400, user);
     } else if(user.erro){
         sendResponse(res, 500, user);
     }

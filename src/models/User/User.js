@@ -1,5 +1,6 @@
 const dataBase = require('../../../config/db');
 const UserSchema = require('../schemas/user');
+const AccessSchema = require('../schemas/user_access');
 const bcrypt = require('bcrypt');
 
 class User {
@@ -23,7 +24,7 @@ class User {
                 user_foto: user_foto
             });
     
-            return {success: true, msg: `O usuário(a) criado com sucesso.`};
+            return {success: true, msg: `Usuário(a) criado com sucesso.`};
         } catch (error) {
             return {erro: error, msg: `Erro ao criar o usuário.`};
         }
@@ -157,6 +158,19 @@ class User {
             return user;
         } catch (error) {
             return {erro: error};
+        }
+    }
+
+    async userAccess(user_id, user_email, user_ip) {
+        try {
+            await AccessSchema.create({
+                user_id: user_id,
+                user_email: user_email,
+                user_ip: user_ip,
+                acesso_data: new Date()
+            })
+        } catch (error) {
+            return {erro: error, msg: `Erro ao salvar o acesso do usuário.`}
         }
     }
 }
