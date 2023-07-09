@@ -48,11 +48,13 @@ async function updateUser(req, res) {
 }
 
 async function disableUser(req, res) {
-    const {user_id} = req.params;
-    const user = await userDB.disableUserDB(user_id);
+    const {user_id, user_acao} = req.query;
+    const user = await userDB.disableUserDB(user_id, user_acao);
 
     if(!user.erro) {
-        const msg = {msg: `Usuário desabilitado com sucesso.`};
+        let action = '';
+        user_acao == 'S' ? action = 'habilitado' : action = 'desabilitado';
+        const msg = {msg: `Usuário ${action} com sucesso.`};
         sendResponse(res, 200, msg);
     } else {
         sendResponse(res, 500, user);

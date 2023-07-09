@@ -6,7 +6,7 @@ const user = express.Router();
 user.post('/novo-usuario', controllers.newUser);
 user.get('/todos-usuarios', user_token.authenticateToken,  controllers.allUsers);
 user.put('/atualiza-usuario', user_token.authenticateToken, controllers.updateUser);
-user.put('/desabilita-usuario/:user_id', user_token.authenticateToken, controllers.disableUser);
+user.put('/desabilita-usuario/', user_token.authenticateToken, controllers.disableUser);
 user.delete('/deletar-usuario/:user_id', user_token.authenticateToken, controllers.deleteUser);
 
 user.post('/login', controllers.userLogin);

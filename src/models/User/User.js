@@ -8,7 +8,6 @@ class User {
     userExists = [];
     passwordHash = '';
     user = [];
-    
 
     async createNewUser(user_nome, user_sobrenome, user_email, user_password, user_tipo, user_token, user_ativo, user_foto) {
         try {
@@ -46,10 +45,12 @@ class User {
         }
     }
 
-    async disableUserDB(user_id) {
+    async disableUserDB(user_id, user_action) {
+        let action = '';
+        user_action == 'S' ? action = 'habilitar' : action = 'desabilitar';
         try {
             await UserSchema.update({
-                user_ativo: 'N',
+                user_ativo: user_action,
                 user_date_desable: new Date()
             },
             {where: {user_id: user_id}}
@@ -57,7 +58,7 @@ class User {
 
             return true;
         } catch (error) {
-            return {erro: error, msg: `Erro ao desabilitar o usuário.`};
+            return {erro: error, msg: `Erro ao ${action} o usuário.`};
         }
     }
 
