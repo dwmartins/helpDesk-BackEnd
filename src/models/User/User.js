@@ -144,6 +144,19 @@ class User {
             return {alert: `Usuário não encontrado.`};
         }
     }
+
+    async fetchUserToken(user_id) {
+        try {
+            const user = await UserSchema.findOne({
+                attributes: ['user_token'],
+                where: {user_id: user_id}
+            });
+
+            return user;
+        } catch (error) {
+            return {erro: error};
+        }
+    }
 }
 
 module.exports = User;
