@@ -32,6 +32,10 @@ const User = dataBase.define('User', {
         type: DataTypes.STRING,
         allowNull: true
     },
+    user_token: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     user_ativo: {
         type: DataTypes.STRING,
         allowNull: true

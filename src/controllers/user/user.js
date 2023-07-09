@@ -1,15 +1,18 @@
 const User = require('../../models/User/User');
 const dataBase = require('../../../config/db');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 const userDB = new User;
 
 async function newUser(req, res) {
     const {user_nome, user_sobrenome, user_email, user_password, user_tipo, user_ativo, user_foto} = req.body;
     const emailExists = await userDB.existingEmail(user_email);
+    const token = newCrypto();
 
     if(!emailExists.length) {
         const password = await userDB.encodePassword(user_password);
-        const user =  await userDB.createNewUser(user_nome, user_sobrenome, user_email, password, user_tipo, user_ativo, user_foto);
+        const user =  await userDB.createNewUser(user_nome, user_sobrenome, user_email, password, user_tipo, token, user_ativo, user_foto);
         if(user.success) {
             sendResponse(res, 201, user);
         } else {
@@ -70,8 +73,12 @@ async function deleteUser(req, res) {
 async function userLogin(req, res) {
     const { user_email, user_password } = req.body;
     const user = await userDB.userLoginDB(user_email, user_password);
-    if(user.success) {
-        sendResponse(res, 200, user.userData);
+    if(user.success) {   
+        const payload  = { email: user.userData.user_email };
+        const token = jwt.sign(payload, user.userData.user_token);
+        const data = {user_token: token, user: user.userData};
+        
+        sendResponse(res, 200, data);
     } else if(user.alert) {
         sendResponse(res, 400, user.alert);
     } else if(user.erro){
@@ -81,6 +88,11 @@ async function userLogin(req, res) {
 
 function sendResponse(res, statusCode, msg) {
     res.status(statusCode).json(msg);
+}
+
+function newCrypto() {
+    const secretKey = crypto.randomBytes(32).toString('hex');
+    return secretKey;
 }
 
 module.exports = {  newUser, 

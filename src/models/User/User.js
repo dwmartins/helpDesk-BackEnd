@@ -10,7 +10,7 @@ class User {
     user = [];
     
 
-    async createNewUser(user_nome, user_sobrenome, user_email, user_password, user_tipo, user_ativo, user_foto) {
+    async createNewUser(user_nome, user_sobrenome, user_email, user_password, user_tipo, user_token, user_ativo, user_foto) {
         try {
             await UserSchema.create({
                 user_nome: user_nome,
@@ -18,6 +18,7 @@ class User {
                 user_email: user_email,
                 user_password: user_password,
                 user_tipo: user_tipo,
+                user_token: user_token,
                 user_ativo: user_ativo,
                 user_date_create: new Date(),
                 user_foto: user_foto
