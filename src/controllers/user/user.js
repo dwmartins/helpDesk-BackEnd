@@ -2,6 +2,7 @@ const User = require('../../models/User/User');
 const dataBase = require('../../../config/db');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const sendEmail = require('../nodemailer/email');
 
 const userDB = new User;
 
@@ -30,6 +31,7 @@ async function newUser(req, res) {
 async function allUsers(req, res) {
     const users = await userDB.allUsersDB();
     if(!users.erro) {
+        sendEmail.welcome();
         sendResponse(res, 200, users);
     } else {
         sendResponse(res, 500, users)
