@@ -15,6 +15,7 @@ async function newUser(req, res) {
         const password = await userDB.encodePassword(user_password);
         const user =  await userDB.createNewUser(user_nome, user_sobrenome, user_email, password, user_tipo, token, user_ativo, user_foto);
         if(user.success) {
+            sendEmail.welcome(user_email, user_nome);
             sendResponse(res, 201, user);
         } else {
             sendResponse(res, 500, user)
@@ -31,7 +32,6 @@ async function newUser(req, res) {
 async function allUsers(req, res) {
     const users = await userDB.allUsersDB();
     if(!users.erro) {
-        sendEmail.welcome();
         sendResponse(res, 200, users);
     } else {
         sendResponse(res, 500, users)

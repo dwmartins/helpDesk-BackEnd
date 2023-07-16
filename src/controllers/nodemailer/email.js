@@ -1,14 +1,21 @@
 const Nodemailer = require('../../models/nodemailer/nodemailer');
+const fs = require('fs');
 
 const sendEmail = new Nodemailer();
 
-function welcome() {
+function welcome(to, name) {
 
-    const to = 'email do destinatario!!'
-    const subject = 'assunto teste'
-    const texthtml = '<strong>teste de envio de e-mail</strong>'
-    sendEmail.sendEmail(to, subject, texthtml);
+   fs.readFile('src/modelsEmail/welcome.html', 'utf8', (err, data) => {
+    if (err) {
+        console.log(`error reading email sending html: ${err}`);
+        return;
+    }
 
+    const modifiedEmail = data.replace('$userName', name);
+    const subject = "Bem vindo ao Help Desk"
+
+    sendEmail.sendEmail(to, subject, modifiedEmail);
+   });
 };
 
-module.exports = {welcome};
+module.exports = { welcome };

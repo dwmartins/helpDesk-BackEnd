@@ -23,10 +23,10 @@ class Nodemailer {
 
         this.transporter.sendMail(mailOptions, function(error, info) {
             if(error) {
-                console.log(error);
+                console.log(`Erro ao enviar o e-mail para ${to}: ${error}`);
             } 
 
-            console.log('E-mail enviado: ' + info.response);
+            return true;
         });
     };
 }
