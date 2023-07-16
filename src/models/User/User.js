@@ -104,7 +104,7 @@ class User {
                 }
             })
 
-            return this.userByEmail.user_id;
+            return this.userByEmail;
         } catch (error) {
             return {erro: error, msg: `Erro ao buscar o usuário.`}
         }

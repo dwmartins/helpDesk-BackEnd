@@ -42,7 +42,7 @@ async function updateUser(req, res) {
     const {user_id, user_nome, user_sobrenome, user_foto} = req.body;
     const user = await userDB.updateUserDB(user_id, user_nome, user_sobrenome, user_foto);
     if(!user.erro) {
-        const msg = {msg: `Usuário atualizado com sucesso.`};
+        const msg = {success: true, msg: `Usuário atualizado com sucesso.`};
         sendResponse(res, 201, msg);
     } else {
         sendResponse(res, 500, user);
@@ -56,7 +56,7 @@ async function disableUser(req, res) {
     if(!user.erro) {
         let action = '';
         user_acao == 'S' ? action = 'habilitado' : action = 'desabilitado';
-        const msg = {msg: `Usuário ${action} com sucesso.`};
+        const msg = {success: true, msg: `Usuário ${action} com sucesso.`};
         sendResponse(res, 200, msg);
     } else {
         sendResponse(res, 500, user);
@@ -67,7 +67,7 @@ async function deleteUser(req, res) {
     const { user_id } = req.params;
     const user = await userDB.deleteUserDB(user_id);
     if(!user.erro) {
-        const msg = {msg: `Usuário excluído com sucesso.`};
+        const msg = {success: true, msg: `Usuário excluído com sucesso.`};
         sendResponse(res, 200, msg);
     } else {
         sendResponse(res, 500, user);
@@ -80,7 +80,7 @@ async function userLogin(req, res) {
     if(user.success) {  
         const payload  = { email: user.userData.user_email };
         const token = jwt.sign(payload, user.userData.user_token);
-        const data = {user_token: token, user: user.userData};
+        const data = {success: true, user_token: token, user: user.userData};
         const user_ip = req.ip.replace('::ffff:', '');
 
         await userDB.userAccess(user.userData.user_id, user_email, user_ip);
@@ -94,24 +94,22 @@ async function userLogin(req, res) {
 
 async function newPassword(req, res) {
     const { user_email } = req.body;
-    const user_id = await userDB.searchUserByEmail(user_email);
+    const user = await userDB.searchUserByEmail(user_email);
     
-    if(user_id) {
-        console.log(user_id)
+    if(user) {
         const code = generateAlphanumericCode(6);
 
-        const saveCode = await userDB.newPasswordDB(user_id, code);
-        console.log(saveCode);
+        const saveCode = await userDB.newPasswordDB(user.user_id, code);
     
         if(saveCode) {
-            const msg = {msg: `Codigo de confirmação enviado no e-mail: ${user_email}`};
+            const msg = {success: true, msg: `Codigo de confirmação enviado no e-mail: ${user_email}`};
             sendResponse(res, 200, msg);
         } else {
             const msg = {erro: saveCode.erro, msg: `Erro ao enviar o codigo de confirmação, tente novamente.`};
             sendResponse(res, 500, msg);
         }
     } else {
-        const msg = {msg: `Usuário não encontrado`}
+        const msg = {alert: `Usuário não encontrado`}
         sendResponse(res, 400, msg);
     }
 }
