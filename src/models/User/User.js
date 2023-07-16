@@ -1,6 +1,7 @@
 const dataBase = require('../../../config/db');
 const UserSchema = require('../schemas/user');
 const AccessSchema = require('../schemas/user_access');
+const New_password = require('../../models/schemas/new_password');
 const bcrypt = require('bcrypt');
 
 class User {
@@ -9,6 +10,7 @@ class User {
     userExists = [];
     passwordHash = '';
     user = [];
+    userByEmail = [];
 
     async createNewUser(user_nome, user_sobrenome, user_email, user_password, user_tipo, user_token, user_ativo, user_foto) {
         try {
@@ -93,6 +95,21 @@ class User {
         }
     }
 
+    async searchUserByEmail(user_email) {
+        try {
+            this.userByEmail = await UserSchema.findOne({
+                attributes: ['user_id'],
+                where: {
+                    user_email: user_email
+                }
+            })
+
+            return this.userByEmail.user_id;
+        } catch (error) {
+            return {erro: error, msg: `Erro ao buscar o usuário.`}
+        }
+    }
+
     async existingEmail(user_email) {
         try {
             this.userExists = await UserSchema.findAll({
@@ -168,9 +185,23 @@ class User {
                 user_email: user_email,
                 user_ip: user_ip,
                 acesso_data: new Date()
-            })
+            });
         } catch (error) {
             return {erro: error, msg: `Erro ao salvar o acesso do usuário.`}
+        }
+    }
+
+    async newPasswordDB(user_id, user_codigo) {
+        try {
+            await New_password.create({
+                user_id: user_id,
+                codigo: user_codigo,
+                data_solicitada: new Date()
+            });
+
+            return true
+        } catch (error) {
+            return {erro: error, msg: `Erro ao salvar o codigo de nova senha.`}
         }
     }
 }

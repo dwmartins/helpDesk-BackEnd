@@ -77,7 +77,7 @@ async function deleteUser(req, res) {
 async function userLogin(req, res) {
     const { user_email, user_password } = req.body;
     const user = await userDB.userLoginDB(user_email, user_password);
-    if(user.success) {   
+    if(user.success) {  
         const payload  = { email: user.userData.user_email };
         const token = jwt.sign(payload, user.userData.user_token);
         const data = {user_token: token, user: user.userData};
@@ -92,6 +92,30 @@ async function userLogin(req, res) {
     }
 }
 
+async function newPassword(req, res) {
+    const { user_email } = req.body;
+    const user_id = await userDB.searchUserByEmail(user_email);
+    
+    if(user_id) {
+        console.log(user_id)
+        const code = generateAlphanumericCode(6);
+
+        const saveCode = await userDB.newPasswordDB(user_id, code);
+        console.log(saveCode);
+    
+        if(saveCode) {
+            const msg = {msg: `Codigo de confirmação enviado no e-mail: ${user_email}`};
+            sendResponse(res, 200, msg);
+        } else {
+            const msg = {erro: saveCode.erro, msg: `Erro ao enviar o codigo de confirmação, tente novamente.`};
+            sendResponse(res, 500, msg);
+        }
+    } else {
+        const msg = {msg: `Usuário não encontrado`}
+        sendResponse(res, 400, msg);
+    }
+}
+
 function sendResponse(res, statusCode, msg) {
     res.status(statusCode).json(msg);
 }
@@ -101,10 +125,23 @@ function newCrypto() {
     return secretKey;
 }
 
+function generateAlphanumericCode(tamanho) {
+    let code = '';
+    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  
+    for (let i = 0; i < tamanho; i++) {
+      const indice = Math.floor(Math.random() * caracteres.length);
+      code += caracteres.charAt(indice);
+    }
+  
+    return code;
+  }
+
 module.exports = {  newUser, 
                     allUsers,
                     updateUser,
                     disableUser,
                     deleteUser,
-                    userLogin
+                    userLogin,
+                    newPassword
                 };

@@ -10,5 +10,6 @@ user.put('/desabilita-usuario/', user_token.authenticateToken, controllers.disab
 user.delete('/deletar-usuario/:user_id', user_token.authenticateToken, controllers.deleteUser);
 
 user.post('/login', controllers.userLogin);
+user.post('/nova-senha', controllers.newPassword);
 
 module.exports = user;
