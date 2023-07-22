@@ -3,6 +3,7 @@ const UserSchema = require('../schemas/user');
 const AccessSchema = require('../schemas/user_access');
 const New_password = require('../../models/schemas/new_password');
 const bcrypt = require('bcrypt');
+const { Op } = require("sequelize");
 
 class User {
 
@@ -98,7 +99,7 @@ class User {
     async searchUserByEmail(user_email) {
         try {
             this.userByEmail = await UserSchema.findOne({
-                attributes: ['user_id'],
+                attributes: ['user_id', 'user_email', 'user_nome'],
                 where: {
                     user_email: user_email
                 }
@@ -131,7 +132,7 @@ class User {
             const hash = await bcrypt.hash(password, 10);
             return hash
         } catch (error) {
-            throw new Error(`Erro ao codificar a senha: ${error}`);
+            return {erro: error, msg: `Erro ao codificar a senha.`}
         }
     }
 
@@ -199,9 +200,55 @@ class User {
                 data_solicitada: new Date()
             });
 
-            return true
+            return true;
         } catch (error) {
-            return {erro: error, msg: `Erro ao salvar o codigo de nova senha.`}
+            return {erro: error, msg: `Erro ao salvar o código de nova senha.`}
+        }
+    }
+
+    async compareCodigoPasswordDB(user_id, codigo) {
+        try {
+            const data =  await New_password.findOne({
+                attributes: ['codigo_id', 'user_id', 'codigo', 'codigo_usado'],
+                where: {
+                    [Op.and]: [
+                        { user_id: user_id },
+                        { codigo: codigo }
+                    ]
+                }
+            });
+
+            return data;
+        } catch (error) {
+            return {erro: error, msg: `Erro ao buscar o código de alteração de senha.`}
+        }
+    }
+
+    async updateCodigoPasswordDB(codigo_id) {
+        try {
+            await New_password.update({
+                codigo_usado: 'Sim',
+            },
+            {where: {codigo_id: codigo_id}
+        });
+            return true;
+        } catch (error) {
+            return {erro: error, msg: `Erro ao atualizar o código de nova senha.`}
+        }
+    }
+
+    async updatePasswordDB(user_id, new_password) {
+        try {
+            await UserSchema.update({
+                user_password: new_password,
+                where: {
+                    user_id: user_id
+                }
+            });
+
+            return true;
+        } catch (error) {
+            return {erro: error, msg: `Erro ao salvar a nova senha, tente novamente.`}
         }
     }
 }

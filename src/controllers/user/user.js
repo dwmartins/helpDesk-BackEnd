@@ -102,15 +102,54 @@ async function newPassword(req, res) {
         const saveCode = await userDB.newPasswordDB(user.user_id, code);
     
         if(saveCode) {
-            const msg = {success: true, msg: `Codigo de confirmação enviado no e-mail: ${user_email}`};
+            sendEmail.newPassword(user.user_email, user.user_nome, code);
+            const msg = {success: true, user_id: user.user_id, msg: `Código de confirmação enviado no e-mail: ${user_email}`};
             sendResponse(res, 200, msg);
         } else {
-            const msg = {erro: saveCode.erro, msg: `Erro ao enviar o codigo de confirmação, tente novamente.`};
+            const msg = {erro: saveCode.erro, msg: `Erro ao enviar o código de confirmação, tente novamente.`};
             sendResponse(res, 500, msg);
         }
     } else {
         const msg = {alert: `Usuário não encontrado`}
         sendResponse(res, 400, msg);
+    }
+}
+
+async function compareCodigoPassword(req, res) {
+    const { user_id, codigo } = req.body;
+    const data = await userDB.compareCodigoPasswordDB(user_id, codigo);
+
+    if(data) {
+        if(data.codigo_usado) {
+            const msg = {alert: `Código de verificação já utilizado`};
+            sendResponse(res, 400, msg);
+        } else {
+            const msg = {success: true, codigo_id: data.codigo_id, codigo: data.codigo, user_id: data.user_id, msg: `Código validado.`};
+            sendResponse(res, 200, msg)
+        }
+       
+    } else {
+        const msg = {alert: `Código de verificação incorreto`};
+        sendResponse(res, 400, msg) 
+    }
+}
+
+async function updatePassword(req, res) {
+    const { user_id, new_password, codigo_id } = req.body;
+    const password_hash = await userDB.encodePassword(new_password);
+    if(password_hash) {
+        const newPassword = await userDB.updatePasswordDB(user_id, password_hash);
+        if(newPassword) {
+            const response = {success: true, msg: `Senha alterada com sucesso.`};
+            await userDB.updateCodigoPasswordDB(codigo_id);
+            sendResponse(res, 200, response);
+        } else {
+            const response = {erro: newPassword.erro, msg: `Erro ao alterar a senha, tente novamente.`};
+            sendResponse(res, 500, response);
+        }
+    } else {
+        const response = {erro: password_hash.erro, msg: `Erro ao alterar a senha, tente novamente.`};
+        sendResponse(res, 500, response);
     }
 }
 
@@ -133,13 +172,16 @@ function generateAlphanumericCode(tamanho) {
     }
   
     return code;
-  }
+}
 
-module.exports = {  newUser, 
-                    allUsers,
-                    updateUser,
-                    disableUser,
-                    deleteUser,
-                    userLogin,
-                    newPassword
-                };
+module.exports = {
+    newUser, 
+    allUsers,
+    updateUser,
+    disableUser,
+    deleteUser,
+    userLogin,
+    newPassword,
+    compareCodigoPassword,
+    updatePassword
+};
