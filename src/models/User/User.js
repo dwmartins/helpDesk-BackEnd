@@ -1,7 +1,10 @@
 const dataBase = require('../../../config/db');
 const UserSchema = require('../schemas/user');
 const AccessSchema = require('../schemas/user_access');
+const User_typeSchema = require('../../models/schemas/user_type');
+const New_password = require('../../models/schemas/new_password');
 const bcrypt = require('bcrypt');
+const { Op } = require("sequelize");
 
 class User {
 
@@ -9,10 +12,12 @@ class User {
     userExists = [];
     passwordHash = '';
     user = [];
+    userByEmail = [];
+    typesUsers = [];
 
     async createNewUser(user_nome, user_sobrenome, user_email, user_password, user_tipo, user_token, user_ativo, user_foto) {
         try {
-            await UserSchema.create({
+            const data = await UserSchema.create({
                 user_nome: user_nome,
                 user_sobrenome: user_sobrenome,
                 user_email: user_email,
@@ -24,7 +29,7 @@ class User {
                 user_foto: user_foto
             });
     
-            return {success: true, msg: `Usuário(a) criado com sucesso.`};
+            return {success: true, msg: `Usuário(a) criado com sucesso.`, userData: data,};
         } catch (error) {
             return {erro: error, msg: `Erro ao criar o usuário.`};
         }
@@ -43,6 +48,60 @@ class User {
             return true;
         } catch (error) {
             return {erro: error, msg: `Erro ao atualizar o usuário.`};
+        }
+    }
+
+    async addTypeUserDB(user_tipo_nome, user_tipo_nivel, user_id) {
+        try {
+            const data = await User_typeSchema.create({
+                user_id: user_id,
+                user_tipo_nome: user_tipo_nome,
+                user_tipo_nivel: user_tipo_nivel
+            });
+            return true;
+        } catch (error) {
+            return {erro: error, msg: `Erro salvar o tipo de usuário.`};
+        }
+    }
+
+    async updateUserTypeDB(user_id, user_tipo_nome, user_tipo_nivel) {
+        try {
+            await User_typeSchema.update({
+                user_id: user_id,
+                user_tipo_nome: user_tipo_nome,
+                user_tipo_nivel: user_tipo_nivel
+            },
+            { where: {user_id: user_id} }
+            )
+            return true;
+        } catch (error) {
+            return {erro: error, msg: `Erro atualizar o tipo de usuário.`};
+        }
+    }
+
+    async updateUserLevel(user_id, user_tipo_nivel) {
+        try {
+            await UserSchema.update({
+                user_tipo: user_tipo_nivel
+            },
+            {where: { user_id: user_id}}
+            );
+            return true;
+        } catch (error) {
+            return {erro: error, msg: `Erro atualizar o tipo de usuário.`};
+        }
+    }
+
+    async allTypeUsers() {
+        try {
+            this.typesUsers = await UserSchema.findAll({
+                order: [
+                    ['user_tipo_id', 'ASC']
+                ]
+            });
+            return this.typesUsers;
+        } catch (error) {
+            return {erro: error, msg: `Erro ao buscar os tipos de usuários.`}; 
         }
     }
 
@@ -93,6 +152,21 @@ class User {
         }
     }
 
+    async searchUserByEmail(user_email) {
+        try {
+            this.userByEmail = await UserSchema.findOne({
+                attributes: ['user_id', 'user_email', 'user_nome'],
+                where: {
+                    user_email: user_email
+                }
+            })
+
+            return this.userByEmail;
+        } catch (error) {
+            return {erro: error, msg: `Erro ao buscar o usuário.`}
+        }
+    }
+
     async existingEmail(user_email) {
         try {
             this.userExists = await UserSchema.findAll({
@@ -114,7 +188,7 @@ class User {
             const hash = await bcrypt.hash(password, 10);
             return hash
         } catch (error) {
-            throw new Error(`Erro ao codificar a senha: ${error}`);
+            return {erro: error, msg: `Erro ao codificar a senha.`}
         }
     }
 
@@ -141,10 +215,10 @@ class User {
             if(passwordHash) {
                 return {success: true, userData: this.user[0]};
             } else {
-                return {alert: `Usuário não encontrado`};
+                return {alert: `Usuário ou senha incorretos`};
             }
         } else {
-            return {alert: `Usuário não encontrado.`};
+            return {alert: `Usuário ou senha incorretos.`};
         }
     }
 
@@ -168,9 +242,67 @@ class User {
                 user_email: user_email,
                 user_ip: user_ip,
                 acesso_data: new Date()
-            })
+            });
         } catch (error) {
             return {erro: error, msg: `Erro ao salvar o acesso do usuário.`}
+        }
+    }
+
+    async newPasswordDB(user_id, user_codigo) {
+        try {
+            await New_password.create({
+                user_id: user_id,
+                codigo: user_codigo,
+                data_solicitada: new Date()
+            });
+
+            return true;
+        } catch (error) {
+            return {erro: error, msg: `Erro ao salvar o código de nova senha.`}
+        }
+    }
+
+    async compareCodigoPasswordDB(user_id, codigo) {
+        try {
+            const data =  await New_password.findOne({
+                attributes: ['codigo_id', 'user_id', 'codigo', 'codigo_usado'],
+                where: {
+                    [Op.and]: [
+                        { user_id: user_id },
+                        { codigo: codigo }
+                    ]
+                }
+            });
+
+            return data;
+        } catch (error) {
+            return {erro: error, msg: `Erro ao buscar o código de alteração de senha.`}
+        }
+    }
+
+    async updateCodigoPasswordDB(codigo_id) {
+        try {
+            await New_password.update({
+                codigo_usado: 'Sim',
+            },
+            {where: {codigo_id: codigo_id} }
+            );
+            return true;
+        } catch (error) {
+            return {erro: error, msg: `Erro ao atualizar o código de nova senha.`}
+        }
+    }
+
+    async updatePasswordDB(user_id, new_password) {
+        try {
+            await UserSchema.update({
+                user_password: new_password,
+            },
+            {where: { user_id: user_id }}
+            );
+            return true;
+        } catch (error) {
+            return {erro: error, msg: `Erro ao salvar a nova senha, tente novamente.`}
         }
     }
 }

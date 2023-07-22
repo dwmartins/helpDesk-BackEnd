@@ -18,4 +18,20 @@ function welcome(to, name) {
    });
 };
 
-module.exports = { welcome };
+function newPassword(to, name, code) {
+    fs.readFile('src/modelsEmail/newPassword.html', 'utf8', (err, data) => {
+        if (err) {
+            console.log(`Error reading password resetting HTML file:${err}`);
+            return;
+        }
+
+        const modifiedEmail = data.replace('$userName', name)
+                            .replace('$verificationCode', code)
+    
+        const subject = "Alteração de Senha";
+
+        sendEmail.sendEmail(to, subject, modifiedEmail);
+    }) 
+}
+
+module.exports = { welcome, newPassword};
