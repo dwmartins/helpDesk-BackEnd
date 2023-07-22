@@ -14,7 +14,6 @@ async function authenticateToken(req, res, next) {
     try {
         const fetchUserToken = await userDB.fetchUserToken(user_id);
         jwt.verify(user_token, fetchUserToken.user_token);
-        console.log('autenticado')
         next();
     } catch (error) {
         const msg = {invalidToken: `Token invalido`};

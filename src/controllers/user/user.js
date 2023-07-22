@@ -15,6 +15,7 @@ async function newUser(req, res) {
         const password = await userDB.encodePassword(user_password);
         const user =  await userDB.createNewUser(user_nome, user_sobrenome, user_email, password, user_tipo, token, user_ativo, user_foto);
         if(user.success) {
+            await userDB.addTypeUserDB('', user_tipo, user.userData.user_id);
             sendEmail.welcome(user_email, user_nome);
             sendResponse(res, 201, user);
         } else {
@@ -46,6 +47,19 @@ async function updateUser(req, res) {
         sendResponse(res, 201, response);
     } else {
         sendResponse(res, 500, user);
+    }
+}
+
+async function updateUserType(req, res) {
+    console.log('ok')
+    const {user_id, user_tipo_nome, user_tipo_nivel} = req.body;
+    const data = await userDB.updateUserTypeDB(user_id, user_tipo_nome, user_tipo_nivel);
+    const user_update = await userDB.updateUserLevel(user_id, user_tipo_nivel);
+    if(data && user_update) {
+        const response = {success: true, msg: `Tipo de usuário alterado para ${user_tipo_nome}`};
+        sendResponse(res, 200, response);
+    } else {
+        sendResponse(res, 500, data);
     }
 }
 
@@ -183,5 +197,6 @@ module.exports = {
     userLogin,
     newPassword,
     compareCodigoPassword,
-    updatePassword
+    updatePassword,
+    updateUserType
 };

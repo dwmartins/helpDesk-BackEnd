@@ -1,6 +1,7 @@
 const dataBase = require('../../../config/db');
 const UserSchema = require('../schemas/user');
 const AccessSchema = require('../schemas/user_access');
+const User_typeSchema = require('../../models/schemas/user_type');
 const New_password = require('../../models/schemas/new_password');
 const bcrypt = require('bcrypt');
 const { Op } = require("sequelize");
@@ -12,10 +13,11 @@ class User {
     passwordHash = '';
     user = [];
     userByEmail = [];
+    typesUsers = [];
 
     async createNewUser(user_nome, user_sobrenome, user_email, user_password, user_tipo, user_token, user_ativo, user_foto) {
         try {
-            await UserSchema.create({
+            const data = await UserSchema.create({
                 user_nome: user_nome,
                 user_sobrenome: user_sobrenome,
                 user_email: user_email,
@@ -27,7 +29,7 @@ class User {
                 user_foto: user_foto
             });
     
-            return {success: true, msg: `Usuário(a) criado com sucesso.`};
+            return {success: true, msg: `Usuário(a) criado com sucesso.`, userData: data,};
         } catch (error) {
             return {erro: error, msg: `Erro ao criar o usuário.`};
         }
@@ -46,6 +48,60 @@ class User {
             return true;
         } catch (error) {
             return {erro: error, msg: `Erro ao atualizar o usuário.`};
+        }
+    }
+
+    async addTypeUserDB(user_tipo_nome, user_tipo_nivel, user_id) {
+        try {
+            const data = await User_typeSchema.create({
+                user_id: user_id,
+                user_tipo_nome: user_tipo_nome,
+                user_tipo_nivel: user_tipo_nivel
+            });
+            return true;
+        } catch (error) {
+            return {erro: error, msg: `Erro salvar o tipo de usuário.`};
+        }
+    }
+
+    async updateUserTypeDB(user_id, user_tipo_nome, user_tipo_nivel) {
+        try {
+            await User_typeSchema.update({
+                user_id: user_id,
+                user_tipo_nome: user_tipo_nome,
+                user_tipo_nivel: user_tipo_nivel
+            },
+            { where: {user_id: user_id} }
+            )
+            return true;
+        } catch (error) {
+            return {erro: error, msg: `Erro atualizar o tipo de usuário.`};
+        }
+    }
+
+    async updateUserLevel(user_id, user_tipo_nivel) {
+        try {
+            await UserSchema.update({
+                user_tipo: user_tipo_nivel
+            },
+            {where: { user_id: user_id}}
+            );
+            return true;
+        } catch (error) {
+            return {erro: error, msg: `Erro atualizar o tipo de usuário.`};
+        }
+    }
+
+    async allTypeUsers() {
+        try {
+            this.typesUsers = await UserSchema.findAll({
+                order: [
+                    ['user_tipo_id', 'ASC']
+                ]
+            });
+            return this.typesUsers;
+        } catch (error) {
+            return {erro: error, msg: `Erro ao buscar os tipos de usuários.`}; 
         }
     }
 
