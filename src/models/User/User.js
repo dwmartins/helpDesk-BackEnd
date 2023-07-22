@@ -159,10 +159,10 @@ class User {
             if(passwordHash) {
                 return {success: true, userData: this.user[0]};
             } else {
-                return {alert: `Usuário não encontrado`};
+                return {alert: `Usuário ou senha incorretos`};
             }
         } else {
-            return {alert: `Usuário não encontrado.`};
+            return {alert: `Usuário ou senha incorretos.`};
         }
     }
 
@@ -229,8 +229,8 @@ class User {
             await New_password.update({
                 codigo_usado: 'Sim',
             },
-            {where: {codigo_id: codigo_id}
-        });
+            {where: {codigo_id: codigo_id} }
+            );
             return true;
         } catch (error) {
             return {erro: error, msg: `Erro ao atualizar o código de nova senha.`}
@@ -241,11 +241,9 @@ class User {
         try {
             await UserSchema.update({
                 user_password: new_password,
-                where: {
-                    user_id: user_id
-                }
-            });
-
+            },
+            {where: { user_id: user_id }}
+            );
             return true;
         } catch (error) {
             return {erro: error, msg: `Erro ao salvar a nova senha, tente novamente.`}
