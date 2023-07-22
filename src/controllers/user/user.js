@@ -21,11 +21,11 @@ async function newUser(req, res) {
             sendResponse(res, 500, user)
         }
     } else if(emailExists.length){
-        const msg = {alert: `Este e-mail já está em uso.`};
-        sendResponse(res, 409, msg);
+        const response = {alert: `Este e-mail já está em uso.`};
+        sendResponse(res, 409, response);
     } else {
-        const msg = {erro: emailExists.erro, msg: `Erro ao criar o usuário.`};
-        sendResponse(res, 500, msg);
+        const response = {erro: emailExists.erro, msg: `Erro ao criar o usuário.`};
+        sendResponse(res, 500, response);
     }
 };
 
@@ -42,8 +42,8 @@ async function updateUser(req, res) {
     const {user_id, user_nome, user_sobrenome, user_foto} = req.body;
     const user = await userDB.updateUserDB(user_id, user_nome, user_sobrenome, user_foto);
     if(!user.erro) {
-        const msg = {success: true, msg: `Usuário atualizado com sucesso.`};
-        sendResponse(res, 201, msg);
+        const response = {success: true, msg: `Usuário atualizado com sucesso.`};
+        sendResponse(res, 201, response);
     } else {
         sendResponse(res, 500, user);
     }
@@ -56,8 +56,8 @@ async function disableUser(req, res) {
     if(!user.erro) {
         let action = '';
         user_acao == 'S' ? action = 'habilitado' : action = 'desabilitado';
-        const msg = {success: true, msg: `Usuário ${action} com sucesso.`};
-        sendResponse(res, 200, msg);
+        const response = {success: true, msg: `Usuário ${action} com sucesso.`};
+        sendResponse(res, 200, response);
     } else {
         sendResponse(res, 500, user);
     }
@@ -67,8 +67,8 @@ async function deleteUser(req, res) {
     const { user_id } = req.params;
     const user = await userDB.deleteUserDB(user_id);
     if(!user.erro) {
-        const msg = {success: true, msg: `Usuário excluído com sucesso.`};
-        sendResponse(res, 200, msg);
+        const response = {success: true, msg: `Usuário excluído com sucesso.`};
+        sendResponse(res, 200, response);
     } else {
         sendResponse(res, 500, user);
     }
@@ -103,15 +103,15 @@ async function newPassword(req, res) {
     
         if(saveCode) {
             sendEmail.newPassword(user.user_email, user.user_nome, code);
-            const msg = {success: true, user_id: user.user_id, msg: `Código de confirmação enviado no e-mail: ${user_email}`};
-            sendResponse(res, 200, msg);
+            const response = {success: true, user_id: user.user_id, msg: `Código de confirmação enviado no e-mail: ${user_email}`};
+            sendResponse(res, 200, response);
         } else {
-            const msg = {erro: saveCode.erro, msg: `Erro ao enviar o código de confirmação, tente novamente.`};
-            sendResponse(res, 500, msg);
+            const response = {erro: saveCode.erro, msg: `Erro ao enviar o código de confirmação, tente novamente.`};
+            sendResponse(res, 500, response);
         }
     } else {
-        const msg = {alert: `Usuário não encontrado`}
-        sendResponse(res, 400, msg);
+        const response = {alert: `Usuário não encontrado`}
+        sendResponse(res, 400, response);
     }
 }
 
@@ -121,16 +121,16 @@ async function compareCodigoPassword(req, res) {
 
     if(data) {
         if(data.codigo_usado) {
-            const msg = {alert: `Código de verificação já utilizado`};
-            sendResponse(res, 400, msg);
+            const response = {alert: `Código de verificação já utilizado`};
+            sendResponse(res, 400, response);
         } else {
-            const msg = {success: true, codigo_id: data.codigo_id, codigo: data.codigo, user_id: data.user_id, msg: `Código validado.`};
-            sendResponse(res, 200, msg)
+            const response = {success: true, codigo_id: data.codigo_id, codigo: data.codigo, user_id: data.user_id, msg: `Código validado.`};
+            sendResponse(res, 200, response)
         }
        
     } else {
-        const msg = {alert: `Código de verificação incorreto`};
-        sendResponse(res, 400, msg) 
+        const response = {alert: `Código de verificação incorreto`};
+        sendResponse(res, 400, response) 
     }
 }
 
