@@ -1,8 +1,9 @@
+const User = require('../schemas/user');
 const { Sequelize, DataTypes} = require('sequelize');
 const dataBase = require('../../../config/db');
 
 const User_type = dataBase.define('user_tipo', {
-    user_tipo_id: {
+    tipo_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         allowNull: false,
@@ -11,10 +12,6 @@ const User_type = dataBase.define('user_tipo', {
     user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-        model: 'users',
-        key: 'user_id',
-        },
     },
     user_tipo_nome: {
         type: DataTypes.STRING,
@@ -25,5 +22,10 @@ const User_type = dataBase.define('user_tipo', {
         allowNull: true
     }
 }) ;
+
+User_type.belongsTo(User, {
+    foreignKey: 'user_id',
+    onDelete: 'CASCADE' // Isso define o comportamento de exclusão em cascata, se um usuário for excluído, seus tipos também serão.
+});
 
 module.exports = User_type;
