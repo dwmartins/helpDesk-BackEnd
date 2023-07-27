@@ -15,7 +15,7 @@ async function newUser(req, res) {
         const password = await userDB.encodePassword(user_password);
         const user =  await userDB.createNewUser(user_nome, user_sobrenome, user_email, password, user_tipo, token, user_ativo, user_foto);
         if(user.success) {
-            await userDB.addTypeUserDB('', user_tipo, user.userData.user_id);
+            await userDB.addTypeUserDB(user_tipo, user.userData.user_id);
             sendEmail.welcome(user_email, user_nome);
             sendResponse(res, 201, user);
         } else {
@@ -40,9 +40,15 @@ async function allUsers(req, res) {
 };
 
 async function updateUser(req, res) {
-    const {user_id, user_nome, user_sobrenome, user_foto} = req.body;
-    const user = await userDB.updateUserDB(user_id, user_nome, user_sobrenome, user_foto);
-    if(!user.erro) {
+    console.log(req.body)
+    const {user_id, user_nome, user_sobrenome, user_tipo, user_foto} = req.body;
+    
+    const [user, data] = await Promise.all([
+        userDB.updateUserDB(user_id, user_nome, user_sobrenome, user_foto),
+        userDB.updateUserTypeDB(user_id, user_tipo)
+    ]);
+
+    if(!user.erro && !data.erro) {
         const response = {success: true, msg: `Usuário atualizado com sucesso.`};
         sendResponse(res, 201, response);
     } else {
@@ -51,12 +57,10 @@ async function updateUser(req, res) {
 }
 
 async function updateUserType(req, res) {
-    console.log('ok')
-    const {user_id, user_tipo_nome, user_tipo_nivel} = req.body;
-    const data = await userDB.updateUserTypeDB(user_id, user_tipo_nome, user_tipo_nivel);
-    const user_update = await userDB.updateUserLevel(user_id, user_tipo_nivel);
-    if(data && user_update) {
-        const response = {success: true, msg: `Tipo de usuário alterado para ${user_tipo_nome}`};
+    const {user_id, user_new_tipo} = req.body;
+    const data = await userDB.updateUserTypeDB(user_id, user_new_tipo);
+    if(data) {
+        const response = {success: true, msg: `Tipo de usuário alterado para ${user_new_tipo}`};
         sendResponse(res, 200, response);
     } else {
         sendResponse(res, 500, data);

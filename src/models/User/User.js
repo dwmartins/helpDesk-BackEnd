@@ -44,48 +44,32 @@ class User {
             },
             {where: {user_id: user_id}}
             );
-
             return true;
         } catch (error) {
             return {erro: error, msg: `Erro ao atualizar o usuário.`};
         }
     }
 
-    async addTypeUserDB(user_tipo_nome, user_tipo_nivel, user_id) {
+    async addTypeUserDB(user_tipo, user_id) {
         try {
-            const data = await User_typeSchema.create({
+            await User_typeSchema.create({
                 user_id: user_id,
-                user_tipo_nome: user_tipo_nome,
-                user_tipo_nivel: user_tipo_nivel
+                user_tipo: user_tipo,
             });
             return true;
         } catch (error) {
             return {erro: error, msg: `Erro salvar o tipo de usuário.`};
         }
     }
-
-    async updateUserTypeDB(user_id, user_tipo_nome, user_tipo_nivel) {
+    
+    async updateUserTypeDB(user_id, user_tipo) {
         try {
             await User_typeSchema.update({
                 user_id: user_id,
-                user_tipo_nome: user_tipo_nome,
-                user_tipo_nivel: user_tipo_nivel
+                user_tipo: user_tipo
             },
             { where: {user_id: user_id} }
             )
-            return true;
-        } catch (error) {
-            return {erro: error, msg: `Erro atualizar o tipo de usuário.`};
-        }
-    }
-
-    async updateUserLevel(user_id, user_tipo_nivel) {
-        try {
-            await UserSchema.update({
-                user_tipo: user_tipo_nivel
-            },
-            {where: { user_id: user_id}}
-            );
             return true;
         } catch (error) {
             return {erro: error, msg: `Erro atualizar o tipo de usuário.`};
@@ -139,15 +123,28 @@ class User {
 
     async allUsersDB() {
         try {
+            // this.results = await UserSchema.findAll({
+            //     where: {user_ativo: 'S'},
+            //     order: [
+            //         ['user_date_create', 'ASC']
+            //     ]
+            // });
+
             this.results = await UserSchema.findAll({
-                where: {user_ativo: 'S'},
-                order: [
-                    ['user_date_create', 'ASC']
+                attributes:['*'],
+                include: [
+                    {
+                        model: User_typeSchema,
+                        where: {
+                            user_ativo: 'S'
+                        }
+                    }
                 ]
-            });
+            })
 
             return this.results;
         } catch(error) {
+            console.log(error)
             return {erro: error, msg: `Erro ao buscar os usuários.`};
         }
     }

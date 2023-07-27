@@ -4,9 +4,9 @@ const userDB = new User;
 
 async function checkUserType(req, res, next) {
     const { user_tipo } = req.body;
-    console.log('aqiiii')
+    console.log(user_tipo)
 
-    if(user_tipo === 1) {
+    if(user_tipo === 'admin') {
         next();
     } else {
         const response = {alert: `Você não tem permissão para alterar o tipo do usuário.`};

@@ -19,18 +19,10 @@ const User = dataBase.define('users', {
     user_email: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
-        validate: {
-            isEmail: true,
-        },
     },
     user_password: {
         type: DataTypes.STRING,
         allowNull: false,
-    },
-    user_tipo: {
-        type: DataTypes.STRING,
-        allowNull: true
     },
     user_token: {
         type: DataTypes.STRING,

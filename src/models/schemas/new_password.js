@@ -1,3 +1,4 @@
+const User = require('../schemas/user');
 const { Sequelize, DataTypes} = require('sequelize');
 const dataBase = require('../../../config/db');
 
@@ -11,10 +12,6 @@ const New_password = dataBase.define('codigo_senha', {
     user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-        model: 'users',
-        key: 'user_id',
-        },
     },
     codigo: {
         type: DataTypes.STRING,
@@ -28,6 +25,11 @@ const New_password = dataBase.define('codigo_senha', {
         type: DataTypes.DATE,
         allowNull: false
     },
+});
+
+New_password.belongsTo(User, {
+    foreignKey: 'user_id',
+    onDelete: 'CASCADE'
 });
 
 module.exports = New_password;
